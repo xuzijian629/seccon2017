@@ -55,10 +55,10 @@ def solve(name):
         ((faces[0][8], 0, 8), (faces[4][0], 4, 0), (faces[2][2], 2, 2)),
         ((faces[0][2], 0, 2), (faces[3][0], 3, 0), (faces[4][2], 4, 2)),
         ((faces[0][0], 0, 0), (faces[5][0], 5, 0), (faces[3][2], 3, 2)),
-        ((faces[1][6], 1, 6), (faces[5][8], 5, 8), (faces[2][6], 2, 6)),
-        ((faces[1][8], 1, 8), (faces[2][8], 2, 8), (faces[4][6], 4, 6)),
-        ((faces[1][2], 1, 2), (faces[4][8], 4, 8), (faces[3][6], 3, 6)),
-        ((faces[1][0], 1, 0), (faces[3][8], 3, 8), (faces[5][6], 5, 6)),
+        ((faces[1][6], 1, 6), (faces[3][8], 3, 8), (faces[5][6], 5, 6)),
+        ((faces[1][8], 1, 8), (faces[4][8], 4, 8), (faces[3][6], 3, 6)),
+        ((faces[1][2], 1, 2), (faces[2][8], 2, 8), (faces[4][6], 4, 6)),
+        ((faces[1][0], 1, 0), (faces[5][8], 5, 8), (faces[2][6], 2, 6)),
     ]
 
     for corner in corners:
@@ -227,7 +227,7 @@ if __name__=="__main__":
                 img.load()
                 try:
                     code = zbarlight.scan_codes('qrcode', img)[0]
-                    print code
+                    print(code)
                     if code[0:4] == 'http':
                         link = get_file(code)
                         for p in generate_png_url('http://qubicrube.pwn.seccon.jp:33654/images/' + link):
