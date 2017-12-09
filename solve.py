@@ -1,4 +1,5 @@
 from PIL import Image
+from collections import Counter
 
 colors = [
     (255, 255, 255), # U
@@ -8,6 +9,8 @@ colors = [
     (196, 30, 58), # R
     (255, 88, 0), # L
 ]
+
+names = ['U', 'D', 'F', 'B', 'R', 'L']
 
 def solve(name):
     u_img = Image.open("{}_U.png".format(name), 'r')
@@ -21,7 +24,18 @@ def solve(name):
     for image in images:
         for y in range(3):
             for x in range(3):
-                print(image.getpixel((x, y)))
+                counter = Counter()
+                for dy in range(82):
+                    for dx in range(82):
+                        pixel = image.getpixel((x * 82 + dx, y * 82 + dy))
+                        try:
+                            index = colors.index(pixel)
+                            counter[index] += 1
+                        except:
+                            pass
+
+                color_index, count = counter.most_common(1)[0]
+                print(names[color_index])
 
     return u_img;
 
