@@ -12,17 +12,18 @@ colors = [
     (255, 88, 0), # L
 ]
 
+pieces = [(0,0,82,82), (0,82,82,164),(0,164,82,246),
+       (82,0,164,82), (82,82,164,164),(82,164,164,246),
+       (164,0,246,82), (164,82,246,164),(164,164,246,246)]
+
 def get_file(f):
     return f[44:-1] + f[-1]
 
 def crop_image(image):
-    xys = [(0,0,81,81), (0,82,81,163),(0,164,81,245),
-           (82,0,163,81), (82,82,163,163),(82,164,163,245),
-           (164,0,245,81), (164,82,245,163),(164,164,245,245)]
-    return map(lambda x: image.crop(x), xys)
+    return map(lambda x: image.crop(x), pieces)
 
 def rotates(image):
-    return map(lambda x: x.rotate(x), [0,90,180,270])
+    return map(lambda x: image.rotate(x), [0,90,180,270])
 
 def get_all_pieces(images):
     ret = []
@@ -30,6 +31,17 @@ def get_all_pieces(images):
         for c in crop_image(image):
             ret += rotates(c)
     return ret
+
+def fileter_by_color(color, images):
+    return filter(lambda x: get_main_color(x) == color, images)
+
+def generate_image(color_images):
+    sample = random.sample(range(9), 9)
+    image = Image.new('RGB', (246,246))
+    for i in range(9):
+        lefttop = (pieces[i][0], pieces[i][1])
+        image.paste(color_images[sample[i]], lefttop)
+    return image
 
 def get_main_color(image):
     x = random.randint(0,81)
@@ -46,12 +58,20 @@ def generate_png_url(url):
 url = 'http://qubicrube.pwn.seccon.jp:33654/images/01000000000000000000'
 
 for _ in range(1):
+    images = []
     for img in generate_png_url(url):
         urllib.urlretrieve(img, get_file(img))
         with open(get_file(img), 'rb') as image_file:
             image = Image.open(image_file)
             image.load()
-        code = zbarlight.scan_codes('qrcode', image)[0]
-        print code
-        if code[0:4] == 'http':
-            url = code.replace('http://qubicrube.pwn.seccon.jp:33654/', 'http://qubicrube.pwn.seccon.jp:33654/images/')
+            images.append(image)
+    pcs = get_all_pieces(images)
+    whites = fileter_by_color(colors[0], pcs)
+    while 1:
+        img = generate_image(whites)
+        try:
+            code = zbarlight.scan_codes('qrcode', img)[0]
+            print code
+            break
+        except TypeError:
+            continue
