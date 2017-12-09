@@ -113,12 +113,90 @@ def solve(name):
                             (part[2] // 3) * 82 + 82
                         )))
 
-    new_images[0].save("{}.png".format(names[0]), 'png')
-    new_images[1].save("{}.png".format(names[1]), 'png')
-    new_images[2].save("{}.png".format(names[2]), 'png')
-    new_images[3].save("{}.png".format(names[3]), 'png')
-    new_images[4].save("{}.png".format(names[4]), 'png')
-    new_images[5].save("{}.png".format(names[5]), 'png')
+    edges = [
+        ((faces[0][7], 0, 7), (faces[2][1], 2, 1)),
+        ((faces[0][5], 0, 5), (faces[4][1], 4, 1)),
+        ((faces[0][1], 0, 1), (faces[3][1], 3, 1)),
+        ((faces[0][3], 0, 3), (faces[5][1], 5, 1)),
+
+        ((faces[2][5], 2, 5), (faces[4][3], 4, 3)),
+        ((faces[4][5], 4, 5), (faces[3][3], 3, 3)),
+        ((faces[3][5], 3, 5), (faces[5][3], 5, 3)),
+        ((faces[5][5], 5, 5), (faces[2][3], 2, 3)),
+
+        ((faces[1][7], 1, 7), (faces[3][7], 3, 7)),
+        ((faces[1][5], 1, 5), (faces[4][7], 4, 7)),
+        ((faces[1][1], 1, 1), (faces[2][7], 2, 7)),
+        ((faces[1][3], 1, 3), (faces[5][7], 5, 7)),
+    ]
+
+    for edge in edges:
+        colorset = list(map(lambda x: x[1], list(edge)))
+        colorset_rotations = [
+            (colorset[0], colorset[1]),
+            (colorset[1], colorset[0]),
+        ]
+
+        for index, rotation in enumerate(colorset_rotations):
+            for edge0 in edges:
+                colorset0 = tuple(map(lambda x: x[0], list(edge0)))
+                if colorset0 == rotation:
+                    print(colorset, colorset0, index, edge, edge0)
+                    for part_index, part in enumerate(edge):
+                        area = images[edge0[(part_index - index) % 2][1]].crop((
+                            (edge0[(part_index - index) % 2][2] % 3) * 82,
+                            (edge0[(part_index - index) % 2][2] // 3) * 82,
+                            (edge0[(part_index - index) % 2][2] % 3) * 82 + 82,
+                            (edge0[(part_index - index) % 2][2] // 3) * 82 + 82
+                        ))
+                        copy_area = area.copy()
+
+                        if edge0[(part_index - index) % 2][2] == 1:
+                            rotate_from = 0
+                        elif edge0[(part_index - index) % 2][2] == 5:
+                            rotate_from = 1
+                        elif edge0[(part_index - index) % 2][2] == 7:
+                            rotate_from = 2
+                        elif edge0[(part_index - index) % 2][2] == 3:
+                            rotate_from = 3
+
+                        if part[2] == 1:
+                            rotate_to = 0
+                        elif part[2] == 5:
+                            rotate_to = 1
+                        elif part[2] == 7:
+                            rotate_to = 2
+                        elif part[2] == 3:
+                            rotate_to = 3
+
+                        if (rotate_to - rotate_from + 4) % 4 == 3:
+                            copy_area = copy_area.transpose(Image.ROTATE_90)
+                        elif (rotate_to - rotate_from + 4) % 4 == 2:
+                            copy_area = copy_area.transpose(Image.ROTATE_180)
+                        elif (rotate_to - rotate_from + 4) % 4 == 1:
+                            copy_area = copy_area.transpose(Image.ROTATE_270)
+
+                        new_images[part[1]].paste(copy_area, ((
+                            (part[2] % 3) * 82,
+                            (part[2] // 3) * 82,
+                            (part[2] % 3) * 82 + 82,
+                            (part[2] // 3) * 82 + 82
+                        )))
+
+    for face in range(6):
+        for rotate in range(4):
+            new_image = new_images[face].copy()
+            center = images[face].crop((82, 82, 82 * 2, 82 * 2))
+            center = center.copy()
+            if rotate == 1:
+                center = center.transpose(Image.ROTATE_90)
+            elif rotate == 2:
+                center = center.transpose(Image.ROTATE_180)
+            elif rotate == 3:
+                center = center.transpose(Image.ROTATE_270)
+
+            new_image.paste(center, (82, 82, 82 * 2, 82 * 2))
+            new_image.save("{}_{}.png".format(names[face], rotate), 'png')
 
     return u_img;
 
