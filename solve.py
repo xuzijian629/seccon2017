@@ -21,6 +21,14 @@ def solve(name):
     l_img = Image.open("{}_L.png".format(name), 'r')
 
     images = [u_img, d_img, f_img, b_img, r_img, l_img]
+    new_images = [
+        Image.new(u_img.mode, (246, 246)),
+        Image.new(u_img.mode, (246, 246)),
+        Image.new(u_img.mode, (246, 246)),
+        Image.new(u_img.mode, (246, 246)),
+        Image.new(u_img.mode, (246, 246)),
+        Image.new(u_img.mode, (246, 246)),
+    ]
     faces = []
     for image in images:
         face = []
@@ -59,13 +67,32 @@ def solve(name):
             (colorset[2], colorset[0], colorset[1]),
         ]
 
-        correct_rotation = None
-        correct_rotation_index = None
         for index, rotation in enumerate(colorset_rotations):
             for corner0 in corners:
                 colorset0 = tuple(map(lambda x: x[0], list(corner0)))
                 if colorset0 == rotation:
-                    pass
+                    print(colorset, colorset0, index, corner, corner0)
+                    for part_index, part in enumerate(corner):
+                        area = images[corner0[(part_index - index) % 3][1]].crop((
+                            (corner0[(part_index - index) % 3][2] % 3) * 82,
+                            (corner0[(part_index - index) % 3][2] // 3) * 82,
+                            (corner0[(part_index - index) % 3][2] % 3) * 82 + 82,
+                            (corner0[(part_index - index) % 3][2] // 3) * 82 + 82
+                        ))
+                        copy_area = area.copy()
+                        new_images[part[1]].paste(copy_area, ((
+                            (part[2] % 3) * 82,
+                            (part[2] // 3) * 82,
+                            (part[2] % 3) * 82 + 82,
+                            (part[2] // 3) * 82 + 82
+                        )))
+
+    new_images[0].save("{}.png".format(names[0]), 'png')
+    new_images[1].save("{}.png".format(names[1]), 'png')
+    new_images[2].save("{}.png".format(names[2]), 'png')
+    new_images[3].save("{}.png".format(names[3]), 'png')
+    new_images[4].save("{}.png".format(names[4]), 'png')
+    new_images[5].save("{}.png".format(names[5]), 'png')
 
     return u_img;
 
