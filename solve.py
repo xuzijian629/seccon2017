@@ -32,6 +32,7 @@ def solve(name):
         Image.new(u_img.mode, (246, 246)),
     ]
     faces = []
+    face_colors = []
     for image in images:
         face = []
         for y in range(3):
@@ -48,17 +49,23 @@ def solve(name):
 
                 color_index, count = counter.most_common(1)[0]
                 face.append(color_index)
+                if x == 1 and y == 1:
+                    face_colors.append(color_index)
         faces.append(face)
 
+    rev_face_colors = [0,0,0,0,0,0]
+    for index, color in enumerate(face_colors):
+        rev_face_colors[color] = index
+
     corners = [
-        ((faces[0][6], 0, 6), (faces[2][0], 2, 0), (faces[5][2], 5, 2)),
-        ((faces[0][8], 0, 8), (faces[4][0], 4, 0), (faces[2][2], 2, 2)),
-        ((faces[0][2], 0, 2), (faces[3][0], 3, 0), (faces[4][2], 4, 2)),
-        ((faces[0][0], 0, 0), (faces[5][0], 5, 0), (faces[3][2], 3, 2)),
-        ((faces[1][6], 1, 6), (faces[3][8], 3, 8), (faces[5][6], 5, 6)),
-        ((faces[1][8], 1, 8), (faces[4][8], 4, 8), (faces[3][6], 3, 6)),
-        ((faces[1][2], 1, 2), (faces[2][8], 2, 8), (faces[4][6], 4, 6)),
-        ((faces[1][0], 1, 0), (faces[5][8], 5, 8), (faces[2][6], 2, 6)),
+        ((faces[0][6], face_colors[0], 6), (faces[2][0], face_colors[2], 0), (faces[5][2], face_colors[5], 2)),
+        ((faces[0][8], face_colors[0], 8), (faces[4][0], face_colors[4], 0), (faces[2][2], face_colors[2], 2)),
+        ((faces[0][2], face_colors[0], 2), (faces[3][0], face_colors[3], 0), (faces[4][2], face_colors[4], 2)),
+        ((faces[0][0], face_colors[0], 0), (faces[5][0], face_colors[5], 0), (faces[3][2], face_colors[3], 2)),
+        ((faces[1][6], face_colors[1], 6), (faces[3][8], face_colors[3], 8), (faces[5][6], face_colors[5], 6)),
+        ((faces[1][8], face_colors[1], 8), (faces[4][8], face_colors[4], 8), (faces[3][6], face_colors[3], 6)),
+        ((faces[1][2], face_colors[1], 2), (faces[2][8], face_colors[2], 8), (faces[4][6], face_colors[4], 6)),
+        ((faces[1][0], face_colors[1], 0), (faces[5][8], face_colors[5], 8), (faces[2][6], face_colors[2], 6)),
     ]
 
     for corner in corners:
@@ -75,7 +82,7 @@ def solve(name):
                 if colorset0 == rotation:
                     # print(colorset, colorset0, index, corner, corner0)
                     for part_index, part in enumerate(corner):
-                        area = images[corner0[(part_index - index) % 3][1]].crop((
+                        area = images[rev_face_colors[corner0[(part_index - index) % 3][1]]].crop((
                             (corner0[(part_index - index) % 3][2] % 3) * 82,
                             (corner0[(part_index - index) % 3][2] // 3) * 82,
                             (corner0[(part_index - index) % 3][2] % 3) * 82 + 82,
@@ -108,7 +115,7 @@ def solve(name):
                         elif (rotate_to - rotate_from + 4) % 4 == 1:
                             copy_area = copy_area.transpose(Image.ROTATE_270)
 
-                        new_images[part[1]].paste(copy_area, ((
+                        new_images[rev_face_colors[part[1]]].paste(copy_area, ((
                             (part[2] % 3) * 82,
                             (part[2] // 3) * 82,
                             (part[2] % 3) * 82 + 82,
@@ -116,20 +123,20 @@ def solve(name):
                         )))
 
     edges = [
-        ((faces[0][7], 0, 7), (faces[2][1], 2, 1)),
-        ((faces[0][5], 0, 5), (faces[4][1], 4, 1)),
-        ((faces[0][1], 0, 1), (faces[3][1], 3, 1)),
-        ((faces[0][3], 0, 3), (faces[5][1], 5, 1)),
+        ((faces[0][7], face_colors[0], 7), (faces[2][1], face_colors[2], 1)),
+        ((faces[0][5], face_colors[0], 5), (faces[4][1], face_colors[4], 1)),
+        ((faces[0][1], face_colors[0], 1), (faces[3][1], face_colors[3], 1)),
+        ((faces[0][3], face_colors[0], 3), (faces[5][1], face_colors[5], 1)),
 
-        ((faces[2][5], 2, 5), (faces[4][3], 4, 3)),
-        ((faces[4][5], 4, 5), (faces[3][3], 3, 3)),
-        ((faces[3][5], 3, 5), (faces[5][3], 5, 3)),
-        ((faces[5][5], 5, 5), (faces[2][3], 2, 3)),
+        ((faces[2][5], face_colors[2], 5), (faces[4][3], face_colors[4], 3)),
+        ((faces[4][5], face_colors[4], 5), (faces[3][3], face_colors[3], 3)),
+        ((faces[3][5], face_colors[3], 5), (faces[5][3], face_colors[5], 3)),
+        ((faces[5][5], face_colors[5], 5), (faces[2][3], face_colors[2], 3)),
 
-        ((faces[1][7], 1, 7), (faces[3][7], 3, 7)),
-        ((faces[1][5], 1, 5), (faces[4][7], 4, 7)),
-        ((faces[1][1], 1, 1), (faces[2][7], 2, 7)),
-        ((faces[1][3], 1, 3), (faces[5][7], 5, 7)),
+        ((faces[1][7], face_colors[1], 7), (faces[3][7], face_colors[3], 7)),
+        ((faces[1][5], face_colors[1], 5), (faces[4][7], face_colors[4], 7)),
+        ((faces[1][1], face_colors[1], 1), (faces[2][7], face_colors[2], 7)),
+        ((faces[1][3], face_colors[1], 3), (faces[5][7], face_colors[5], 7)),
     ]
 
     for edge in edges:
@@ -145,7 +152,7 @@ def solve(name):
                 if colorset0 == rotation:
                     # print(colorset, colorset0, index, edge, edge0)
                     for part_index, part in enumerate(edge):
-                        area = images[edge0[(part_index - index) % 2][1]].crop((
+                        area = images[rev_face_colors[edge0[(part_index - index) % 2][1]]].crop((
                             (edge0[(part_index - index) % 2][2] % 3) * 82,
                             (edge0[(part_index - index) % 2][2] // 3) * 82,
                             (edge0[(part_index - index) % 2][2] % 3) * 82 + 82,
@@ -178,7 +185,7 @@ def solve(name):
                         elif (rotate_to - rotate_from + 4) % 4 == 1:
                             copy_area = copy_area.transpose(Image.ROTATE_270)
 
-                        new_images[part[1]].paste(copy_area, ((
+                        new_images[rev_face_colors[part[1]]].paste(copy_area, ((
                             (part[2] % 3) * 82,
                             (part[2] // 3) * 82,
                             (part[2] % 3) * 82 + 82,
