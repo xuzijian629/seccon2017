@@ -80,6 +80,32 @@ def solve(name):
                             (corner0[(part_index - index) % 3][2] // 3) * 82 + 82
                         ))
                         copy_area = area.copy()
+
+                        if corner0[(part_index - index) % 3][2] == 0:
+                            rotate_from = 0
+                        elif corner0[(part_index - index) % 3][2] == 2:
+                            rotate_from = 1
+                        elif corner0[(part_index - index) % 3][2] == 8:
+                            rotate_from = 2
+                        elif corner0[(part_index - index) % 3][2] == 6:
+                            rotate_from = 3
+
+                        if part[2] == 0:
+                            rotate_to = 0
+                        elif part[2] == 2:
+                            rotate_to = 1
+                        elif part[2] == 8:
+                            rotate_to = 2
+                        elif part[2] == 6:
+                            rotate_to = 3
+
+                        if (rotate_to - rotate_from + 4) % 4 == 3:
+                            copy_area = copy_area.transpose(Image.ROTATE_90)
+                        elif (rotate_to - rotate_from + 4) % 4 == 2:
+                            copy_area = copy_area.transpose(Image.ROTATE_180)
+                        elif (rotate_to - rotate_from + 4) % 4 == 1:
+                            copy_area = copy_area.transpose(Image.ROTATE_270)
+
                         new_images[part[1]].paste(copy_area, ((
                             (part[2] % 3) * 82,
                             (part[2] // 3) * 82,
