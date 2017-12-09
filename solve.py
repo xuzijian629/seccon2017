@@ -1,5 +1,7 @@
 from PIL import Image
 from collections import Counter
+import zbarlight
+import urllib
 
 colors = [
     (255, 255, 255), # U
@@ -71,7 +73,7 @@ def solve(name):
             for corner0 in corners:
                 colorset0 = tuple(map(lambda x: x[0], list(corner0)))
                 if colorset0 == rotation:
-                    print(colorset, colorset0, index, corner, corner0)
+                    # print(colorset, colorset0, index, corner, corner0)
                     for part_index, part in enumerate(corner):
                         area = images[corner0[(part_index - index) % 3][1]].crop((
                             (corner0[(part_index - index) % 3][2] % 3) * 82,
@@ -141,7 +143,7 @@ def solve(name):
             for edge0 in edges:
                 colorset0 = tuple(map(lambda x: x[0], list(edge0)))
                 if colorset0 == rotation:
-                    print(colorset, colorset0, index, edge, edge0)
+                    # print(colorset, colorset0, index, edge, edge0)
                     for part_index, part in enumerate(edge):
                         area = images[edge0[(part_index - index) % 2][1]].crop((
                             (edge0[(part_index - index) % 2][2] % 3) * 82,
@@ -200,5 +202,35 @@ def solve(name):
 
     return u_img;
 
+def get_file(f):
+    return f[37:-1] + f[-1]
+
+def get_file_name(f):
+    return f[44:-1] + f[-1]
+
+def generate_png_url(url):
+    suffix = ['_U', '_D', '_L', '_R', '_F', '_B']
+    return map(lambda s: url + s + '.png', suffix)
+
 if __name__=="__main__":
-    print(solve('02c286df1bbd7923d1f7'))
+    answers = []
+    for i in ['U', 'D', 'L', 'R', 'F', 'B']:
+        for j in [0,1,2,3]:
+            answers.append("%s_%d.png" % (i,j))
+
+    link = '01000000000000000000'
+    for _ in range(50):
+        solve(link)
+        for i in range(24):
+            with open(answers[i], 'rb') as f:
+                img = Image.open(f)
+                img.load()
+                try:
+                    code = zbarlight.scan_codes('qrcode', img)[0]
+                    print code
+                    if code[0:4] == 'http':
+                        link = get_file(code)
+                        for p in generate_png_url('http://qubicrube.pwn.seccon.jp:33654/images/' + link):
+                            urllib.urlretrieve(p, get_file_name(p))
+                except TypeError:
+                    continue

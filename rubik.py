@@ -67,8 +67,12 @@ for _ in range(1):
             images.append(image)
     pcs = get_all_pieces(images)
     whites = fileter_by_color(colors[0], pcs)
+
+    tries = 0
     while 1:
         img = generate_image(whites)
+        tries += 1
+        print tries
         try:
             code = zbarlight.scan_codes('qrcode', img)[0]
             print code
